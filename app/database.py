@@ -59,7 +59,9 @@ def tum_leadler():
     db.close()
 
     return [dict(lead) for lead in leadler]
-    def istatistikler():
+
+
+def istatistikler():
     """Toplam, bu hafta ve bugünkü kayıt sayılarını hesaplar."""
     db = get_db()
 
@@ -88,3 +90,4 @@ def tum_leadler():
         "bu_hafta": bu_hafta,
         "bugun": bugun
     }
+
