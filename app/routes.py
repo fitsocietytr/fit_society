@@ -1,4 +1,6 @@
-from flask import Blueprint, jsonify, render_template, request
+import os
+from functools import wraps
+from flask import Blueprint, jsonify, render_template, request, abort
 
 from app.database import lead_ekle, tum_leadler
 from app.services.ai_service import AIServiceError, ai_service
@@ -10,6 +12,16 @@ page_bp = Blueprint("pages", __name__)
 
 # API rotaları
 api_bp = Blueprint("api", __name__)
+
+
+def admin_gerekli(f):
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        anahtar = request.headers.get("X-Admin-Key")
+        if not anahtar or anahtar != os.environ.get("ADMIN_KEY"):
+            abort(401)
+        return f(*args, **kwargs)
+    return wrapper
 
 
 @page_bp.route("/")
@@ -80,6 +92,7 @@ def lead_olustur():
 
 
 @api_bp.route("/leads", methods=["GET"])
+@admin_gerekli
 def leadleri_getir():
     try:
         leadler = tum_leadler()

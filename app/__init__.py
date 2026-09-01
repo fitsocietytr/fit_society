@@ -14,8 +14,9 @@ def create_app():
     # Geliştirme ayarlarını yükle
     app.config.from_object(DevelopmentConfig)
 
-    # Wix bağlantısı için CORS'u etkinleştir
-    CORS(app)
+    # Wix bağlantısı için CORS'u etkinleştir (sadece izinli domain'lere)
+    CORS(app, origins=DevelopmentConfig.CORS_ORIGINS.split(","))
+
 
     # Veritabanını başlat
     init_db(app)

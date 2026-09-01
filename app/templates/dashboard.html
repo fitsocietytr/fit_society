@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fit Society - Yönetim Paneli</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #111;
+    color: #eee;
+    margin: 0;
+    padding: 20px;
+  }
+  h1 { color: #ff5722; }
+  .anahtar-kutusu {
+    margin-bottom: 20px;
+    display: flex;
+    gap: 8px;
+  }
+  input {
+    flex: 1;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #444;
+    background: #222;
+    color: #fff;
+  }
+  button {
+    padding: 10px 16px;
+    border: none;
+    border-radius: 6px;
+    background: #ff5722;
+    color: #fff;
+    cursor: pointer;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+  th, td {
+    text-align: left;
+    padding: 10px;
+    border-bottom: 1px solid #333;
+  }
+  th { color: #ff5722; }
+  #durum { margin-top: 10px; color: #aaa; }
+</style>
+</head>
+<body>
+
+<h1>Fit Society - Yönetim Paneli</h1>
+
+<div class="anahtar-kutusu">
+  <input type="password" id="adminKey" placeholder="Admin anahtarını gir">
+  <button onclick="kaydetVeYukle()">Giriş Yap</button>
+</div>
+
+<div id="durum"></div>
+
+<table id="leadTablosu" style="display:none;">
+  <thead>
+    <tr>
+      <th>İsim</th>
+      <th>Telefon</th>
+      <th>Mesaj</th>
+      <th>Tarih</th>
+    </tr>
+  </thead>
+  <tbody id="leadGovde"></tbody>
+</table>
+

@@ -15,7 +15,8 @@ class AIService:
         self.api_key = Config.GROQ_API_KEY
         self.business_context = Config.BUSINESS_CONTEXT
         self.api_url = "https://api.groq.com/openai/v1/chat/completions"
-        self.model = "llama-3.1-8b-instant"
+        self.model = "openai/gpt-oss-20b"
+
 
     def _sistem_talimati(self):
         """Yapay zekânın sistem talimatını döndürür."""
@@ -39,9 +40,11 @@ class AIService:
             }
         ]
 
-        # Önceki konuşmaları mesaja ekler.
+        # Önceki konuşmaları mesaja ekler (son 15 mesajla sınırlı).
         if gecmis:
-            messages.extend(gecmis)
+            messages.extend(gecmis[-15:])
+
+#
 
         # Yeni kullanıcı mesajını en sona ekler.
         messages.append(
@@ -53,8 +56,11 @@ class AIService:
 
         payload = {
             "model": self.model,
-            "messages": messages
+            "messages": messages,
+            "max_tokens": 500,
+            "temperature": 0.7
         }
+
 
         headers = {
             "Authorization": f"Bearer {self.api_key}",
