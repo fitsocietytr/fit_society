@@ -59,3 +59,32 @@ def tum_leadler():
     db.close()
 
     return [dict(lead) for lead in leadler]
+    def istatistikler():
+    """Toplam, bu hafta ve bugünkü kayıt sayılarını hesaplar."""
+    db = get_db()
+
+    toplam = db.execute(
+        "SELECT COUNT(*) as sayi FROM leads"
+    ).fetchone()["sayi"]
+
+    bu_hafta = db.execute(
+        """
+        SELECT COUNT(*) as sayi FROM leads
+        WHERE tarih >= datetime('now', '-7 days')
+        """
+    ).fetchone()["sayi"]
+
+    bugun = db.execute(
+        """
+        SELECT COUNT(*) as sayi FROM leads
+        WHERE date(tarih) = date('now')
+        """
+    ).fetchone()["sayi"]
+
+    db.close()
+
+    return {
+        "toplam": toplam,
+        "bu_hafta": bu_hafta,
+        "bugun": bugun
+    }

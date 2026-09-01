@@ -2,7 +2,7 @@ import os
 from functools import wraps
 from flask import Blueprint, jsonify, render_template, request, abort
 
-from app.database import lead_ekle, tum_leadler
+from app.database import lead_ekle, tum_leadler, istatistikler
 from app.services.ai_service import AIServiceError, ai_service
 
 
@@ -106,4 +106,21 @@ def leadleri_getir():
         return jsonify({
             "basari": False,
             "hata": "Lead kayıtları alınamadı."
+        }), 500
+
+@api_bp.route("/istatistikler", methods=["GET"])
+@admin_gerekli
+def istatistikleri_getir():
+    try:
+        veri = istatistikler()
+
+        return jsonify({
+            "basari": True,
+            "istatistikler": veri
+        })
+
+    except Exception:
+        return jsonify({
+            "basari": False,
+            "hata": "İstatistikler alınamadı."
         }), 500
