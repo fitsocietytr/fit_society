@@ -11,9 +11,10 @@ class Config:
     )
 
     DATABASE_URL = os.environ.get(
-        "DATABASE_URL",
-        "sqlite:///leads.db"
-    )
+    "DATABASE_URL",
+    "leads.db"          # "sqlite:///leads.db" değil, düz dosya adı
+)
+
 
     GROQ_API_KEY = os.environ.get(
         "GROQ_API_KEY",
