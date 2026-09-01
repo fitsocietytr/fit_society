@@ -21,8 +21,6 @@
     padding: 16px;
   }
   h2 { color: #ff5722; margin-top: 0; font-size: 18px; }
-
-  /* Chatbot alanı */
   #sohbetGovde {
     height: 300px;
     overflow-y: auto;
@@ -36,4 +34,134 @@
   .bot { color: #ffb74d; }
   .satir { display: flex; gap: 8px; }
   input, textarea {
-    
+    flex: 1;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #444;
+    background: #222;
+    color: #fff;
+    font-family: inherit;
+  }
+  button {
+    padding: 10px 16px;
+    border: none;
+    border-radius: 6px;
+    background: #ff5722;
+    color: #fff;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  button:disabled { background: #555; cursor: not-allowed; }
+  .form-alan { display: flex; flex-direction: column; gap: 10px; }
+  #formDurum { margin-top: 8px; color: #aaa; }
+</style>
+</head>
+<body>
+<h1>Fit Society</h1>
+
+<div class="kutu">
+  <h2>💬 Bize Sor</h2>
+  <div id="sohbetGovde"></div>
+  <div class="satir">
+    <input type="text" id="mesajGirisi" placeholder="Bir soru sor...">
+    <button id="gonderBtn" onclick="mesajGonder()">Gönder</button>
+  </div>
+</div>
+
+<div class="kutu">
+  <h2>📝 Ücretsiz Deneme Dersi İçin Kayıt Ol</h2>
+  <div class="form-alan">
+    <input type="text" id="isimAlani" placeholder="Adın Soyadın">
+    <input type="tel" id="telefonAlani" placeholder="Telefon Numaran">
+    <textarea id="mesajAlani" placeholder="Eklemek istediğin bir şey var mı? (opsiyonel)" rows="3"></textarea>
+    <button onclick="kayitGonder()">Kayıt Ol</button>
+    <div id="formDurum"></div>
+  </div>
+</div>
+<script>
+  const sohbetGovde = document.getElementById("sohbetGovde");
+  const mesajGirisi = document.getElementById("mesajGirisi");
+  const gonderBtn = document.getElementById("gonderBtn");
+  let gecmis = [];
+
+  function mesajEkle(rol, metin) {
+    const div = document.createElement("div");
+    div.className = "mesaj " + (rol === "user" ? "kullanici" : "bot");
+    div.textContent = (rol === "user" ? "Sen: " : "Fit Society: ") + metin;
+    sohbetGovde.appendChild(div);
+    sohbetGovde.scrollTop = sohbetGovde.scrollHeight;
+  }
+
+  async function mesajGonder() {
+    const mesaj = mesajGirisi.value.trim();
+    if (!mesaj) return;
+
+    mesajEkle("user", mesaj);
+    gecmis.push({ role: "user", content: mesaj });
+    mesajGirisi.value = "";
+    gonderBtn.disabled = true;
+
+    try {
+      const yanit = await fetch("/sohbet", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mesaj: mesaj, gecmis: gecmis })
+      });
+
+      const veri = await yanit.json();
+
+      if (veri.basari) {
+        mesajEkle("bot", veri.cevap);
+        gecmis.push({ role: "assistant", content: veri.cevap });
+      } else {
+        mesajEkle("bot", "Üzgünüm, bir hata oluştu: " + veri.hata);
+      }
+    } catch (hata) {
+      mesajEkle("bot", "Sunucuya bağlanılamadı.");
+    } finally {
+      gonderBtn.disabled = false;
+    }
+  }
+
+  mesajGirisi.addEventListener("keydown", function(e) {
+    if (e.key === "Enter") mesajGonder();
+  });
+
+  async function kayitGonder() {
+    const isim = document.getElementById("isimAlani").value.trim();
+    const telefon = document.getElementById("telefonAlani").value.trim();
+    const mesaj = document.getElementById("mesajAlani").value.trim();
+    const durum = document.getElementById("formDurum");
+
+    if (!isim || !telefon) {
+      durum.textContent = "İsim ve telefon zorunludur.";
+      return;
+    }
+
+    durum.textContent = "Gönderiliyor...";
+
+    try {
+      const yanit = await fetch("/leads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isim: isim, telefon: telefon, mesaj: mesaj })
+      });
+
+      const veri = await yanit.json();
+
+      if (veri.basari) {
+        durum.textContent = "✅ " + veri.mesaj;
+        document.getElementById("isimAlani").value = "";
+        document.getElementById("telefonAlani").value = "";
+        document.getElementById("mesajAlani").value = "";
+      } else {
+        durum.textContent = "❌ " + veri.hata;
+      }
+    } catch (hata) {
+      durum.textContent = "❌ Sunucuya bağlanılamadı.";
+    }
+  }
+</script>
+
+</body>
+</html>
