@@ -52,6 +52,21 @@
 
 <h1>Fit Society - Yönetim Paneli</h1>
 
+<div id="istatistikler" style="display:flex; gap:12px; margin-bottom:20px; flex-wrap:wrap;">
+  <div style="background:#1c1c1c; padding:16px; border-radius:8px; flex:1; min-width:120px;">
+    <div style="color:#aaa; font-size:14px;">Toplam Kayıt</div>
+    <div id="istToplam" style="font-size:28px; color:#ff5722; font-weight:bold;">-</div>
+  </div>
+  <div style="background:#1c1c1c; padding:16px; border-radius:8px; flex:1; min-width:120px;">
+    <div style="color:#aaa; font-size:14px;">Bu Hafta</div>
+    <div id="istHafta" style="font-size:28px; color:#ff5722; font-weight:bold;">-</div>
+  </div>
+  <div style="background:#1c1c1c; padding:16px; border-radius:8px; flex:1; min-width:120px;">
+    <div style="color:#aaa; font-size:14px;">Bugün</div>
+    <div id="istBugun" style="font-size:28px; color:#ff5722; font-weight:bold;">-</div>
+  </div>
+</div>
+
 <div class="anahtar-kutusu">
   <input type="password" id="adminKey" placeholder="Admin anahtarını gir">
   <button onclick="kaydetVeYukle()">Giriş Yap</button>
@@ -65,77 +80,4 @@
       <th>İsim</th>
       <th>Telefon</th>
       <th>Mesaj</th>
-      <th>Tarih</th>
-    </tr>
-  </thead>
-  <tbody id="leadGovde"></tbody>
-</table>
-
-<script>
-  const durum = document.getElementById("durum");
-  const tablo = document.getElementById("leadTablosu");
-  const govde = document.getElementById("leadGovde");
-  const inputAlani = document.getElementById("adminKey");
-
-  // Daha önce girilmiş anahtar varsa otomatik doldur
-  const kayitliAnahtar = localStorage.getItem("fitSocietyAdminKey");
-  if (kayitliAnahtar) {
-    inputAlani.value = kayitliAnahtar;
-    leadleriGetir(kayitliAnahtar);
-  }
-
-  function kaydetVeYukle() {
-    const anahtar = inputAlani.value.trim();
-    if (!anahtar) {
-      durum.textContent = "Lütfen admin anahtarını gir.";
-      return;
-    }
-    localStorage.setItem("fitSocietyAdminKey", anahtar);
-    leadleriGetir(anahtar);
-  }
-
-  async function leadleriGetir(anahtar) {
-    durum.textContent = "Yükleniyor...";
-    tablo.style.display = "none";
-
-    try {
-      const yanit = await fetch("/leads", {
-        headers: { "X-Admin-Key": anahtar }
-      });
-
-      if (yanit.status === 401) {
-        durum.textContent = "Anahtar hatalı. Tekrar dene.";
-        localStorage.removeItem("fitSocietyAdminKey");
-        return;
-      }
-
-      const veri = await yanit.json();
-
-      if (!veri.basari) {
-        durum.textContent = "Hata: " + veri.hata;
-        return;
-      }
-
-      govde.innerHTML = "";
-      veri.leadler.forEach(lead => {
-        const satir = document.createElement("tr");
-        satir.innerHTML = `
-          <td>${lead.isim}</td>
-          <td>${lead.telefon}</td>
-          <td>${lead.mesaj || "-"}</td>
-          <td>${lead.tarih}</td>
-        `;
-        govde.appendChild(satir);
-      });
-
-      durum.textContent = `${veri.leadler.length} kayıt bulundu.`;
-      tablo.style.display = "table";
-
-    } catch (hata) {
-      durum.textContent = "Sunucuya bağlanılamadı.";
-    }
-  }
-</script>
-
-</body>
-</html>
+      <th>Tarih
